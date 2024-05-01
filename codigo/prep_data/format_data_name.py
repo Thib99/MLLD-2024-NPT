@@ -23,11 +23,11 @@ def rename_images(folder_path, pattern_new_name, folder_output):
             count += 1
 
 # Specify the folder paths
-no_folder_path = "Dataset/brain_tumor_dataset/no"
-yes_folder_path = "Dataset/brain_tumor_dataset/yes"
+no_folder_path = "MLLD-2024-NPT/Dataset/no"
+yes_folder_path = "MLLD-2024-NPT/Dataset/yes"
 
 # Rename images in the 'no' folder
-rename_images(no_folder_path, "no_", "Dataset//no")
+rename_images(no_folder_path, "no_", "MLLD-2024-NPT/Dataset/no")
 
 # Rename images in the 'yes' folder
-rename_images(yes_folder_path, "yes_", "Dataset//yes")
+rename_images(yes_folder_path, "yes_", "MLLD-2024-NPT/Dataset/yes")
