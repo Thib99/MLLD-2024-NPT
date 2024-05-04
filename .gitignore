@@ -1,3 +1,8 @@
+# own file
+thib_cache/
+myvenv/
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
