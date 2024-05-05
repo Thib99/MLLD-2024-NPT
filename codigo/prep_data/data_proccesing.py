@@ -40,7 +40,7 @@ def load_data_flatten() :
     # loop trough all the images in the dataset
     for file in glob.iglob('Dataset/*/*.jpg'):
         
-        # get the image, resize it, make it grey scale, and flatten it
+        # get the image, resize it, make it grey scale, and flatten it to a 1D array
         img = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
         img = cv2.resize(img, (128, 128))
         img = img.flatten()
