@@ -54,8 +54,9 @@ def load_data_flatten() :
     
     return np.array(data), np.array(labels)
 
+
+
 # print some information about the data, when script executed
 if __name__ == '__main__':
+    pass
     
-    data, labels = load_data_flatten()
-    print(data.shape)
