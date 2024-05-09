@@ -7,29 +7,34 @@ path_No = 'Dataset/no/*'
 path_Yes = 'Dataset/yes/*'
 
 def load_data():
-    tumor = []
-    no_tumor = []
+    import cv2
+import numpy as np
+import glob
 
-    for file in glob.iglob(path_Yes):
-        img = cv2.imread(file)      #Reading the images from the path
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)        #Changing the color from BGR to RGB
-        img = cv2.resize(img, (128, 128)) 
-        tumor.append((img, 1))  # Appending tuple with image and label 1 (indicating presence of tumor)
-
-    for file in glob.iglob(path_No):
-        img = cv2.imread(file)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img = cv2.resize(img, (128, 128))
-        no_tumor.append((img, 0))  # Appending tuple with image and label 0 (indicating absence of tumor)
-
-    # Concatenating the two lists and shuffle the data
-    all_data = tumor + no_tumor
-
-
-    # Splitting data and labels
-    data = np.array([item[0] for item in all_data])
-    labels = np.array([item[1] for item in all_data])
-
+def load_data_flatten():
+    data, labels = [], []
+    
+    # Load 'yes' images
+    for file in glob.iglob('Dataset/yes/*.jpg'):
+        img = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
+        img = cv2.resize(img, (128, 128))  # Resize to (128, 128)
+        data.append(img)
+        labels.append(1)  # Label 1 for 'yes'
+    
+    # Load 'no' images
+    for file in glob.iglob('Dataset/no/*.jpg'):
+        img = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
+        img = cv2.resize(img, (128, 128))  # Resize to (128, 128)
+        data.append(img)
+        labels.append(0)  # Label 0 for 'no'
+    
+    # Convert lists to numpy arrays
+    data = np.array(data)
+    labels = np.array(labels)
+    
+    # Reshape data to have shape (num_samples, height, width, channels)
+    data = np.expand_dims(data, axis=-1)  # Add a single channel dimension
+    
     return data, labels
 
 
