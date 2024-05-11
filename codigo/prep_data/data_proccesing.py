@@ -3,19 +3,17 @@ import numpy as np
 import glob
 import cv2
 
+
 path_No = 'Dataset/no/*'
 path_Yes = 'Dataset/yes/*'
 
-def load_data():
-    import cv2
-import numpy as np
-import glob
 
-def load_data_flatten():
+def load_data():
     data, labels = [], []
     
     # Load 'yes' images
     for file in glob.iglob('Dataset/yes/*.jpg'):
+        print("Processing file:", file)  # Add this line for debugging
         img = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
         img = cv2.resize(img, (128, 128))  # Resize to (128, 128)
         data.append(img)
@@ -23,6 +21,7 @@ def load_data_flatten():
     
     # Load 'no' images
     for file in glob.iglob('Dataset/no/*.jpg'):
+        print("Processing file:", file)  # Add this line for debugging
         img = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
         img = cv2.resize(img, (128, 128))  # Resize to (128, 128)
         data.append(img)
