@@ -6,7 +6,20 @@ import shutil
 import cv2
 import numpy as np
 
+
+
 def process_folder(folder_path, pattern_new_name, folder_output):
+    """
+    Process the images in the specified folder by renaming them and resizing them based on the bounding box of the brain.
+    
+    Args:
+    - folder_path: Path of the folder containing the images to be processed.
+    - pattern_new_name: Pattern for the new names of the images.
+    - folder_output: Path of the folder where the processed images will be saved.
+    """
+    
+    
+    
     # delete the folder if it already exists and create a new one
     if os.path.exists(folder_output):
         shutil.rmtree(folder_output)
@@ -34,10 +47,20 @@ def process_folder(folder_path, pattern_new_name, folder_output):
 
 
 def resize_images_based_on_outbound(file_name, file_name_output):
+    """
+    Resize the image based on the bounding box of the brain.
+    The function detect the outbounds in the image thank's to the Sobel filter and only keep the part of the image inside the outbounds.
+    The image is then resized to the specified size_output, to have a consistent size for all images.
+    
+    Args:
+    - file_name: Path of the image to be resized.
+    - file_name_output: Path of the resized image.
+    """
+    
     # load the image in gray scale
     image = cv2.imread(file_name, cv2.IMREAD_GRAYSCALE)
 
-    # Convolution Matrice (filtre de Sobel)
+    # Convolution Matrice (filtre de Sobel) 
     kernel_x = np.array([[-1, 0, 1],
                         [-2, 0, 2],
                         [-1, 0, 1]])
@@ -68,7 +91,7 @@ def resize_images_based_on_outbound(file_name, file_name_output):
         for point in contour:
             all_contours_points.append(point[0])
 
-  
+    # convert the list of points to a numpy array
     all_contours_points = np.array(all_contours_points)
 
     # Find the bounding rectangle of al the countours points 
