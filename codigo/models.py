@@ -10,7 +10,12 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.calibration import cross_val_predict
 from sklearn.cluster import KMeans
 from sklearn.model_selection import cross_validate
-
+from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, Flatten
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.metrics import Precision, Recall
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.losses import BinaryCrossentropy
 
 
 def Quadratic() :
@@ -211,3 +216,28 @@ def getData_allModels_CrossValidation(X, Y , template_data) :
         template_data[key]['false_negatif'] = (np.mean(template_data[key]['false_negatif'])).round(2) 
     
     return template_data
+
+def cnn(dense_activation_size, X_train, y_train):
+    # Initialize a Sequential model
+    model = Sequential()
+
+    # Add Convolutional and Pooling layers
+    model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(128, 128, 1)))   # Add Conv2D layer with 32 filters, relu activation function, and input shape
+    model.add(MaxPooling2D((2, 2)))                                                # Add MaxPooling2D layer with pool size (2,2)
+    model.add(Conv2D(32, (3, 3), activation='relu'))                                # Add another Conv2D layer with 32 filters and relu activation function
+    model.add(MaxPooling2D((2, 2)))                                                # Add another MaxPooling2D layer with pool size (2,2)
+
+    # Flatten the output from Convolutional layers
+    model.add(Flatten())                            # Flatten the output from Convolutional and Pooling layers                                           
+
+    # Add Dense layers
+    model.add(Dense(dense_activation_size, activation='relu'))         # Add Dense layer with specified number of neurons and relu activation function
+    model.add(Dense(1, activation='sigmoid'))      # Add Dense layer with 1 neuron and sigmoid activation function
+
+    # Compile the model
+    model.compile(loss=BinaryCrossentropy(), optimizer=Adam(),  metrics=['accuracy', Precision(), Recall()])
+
+    # Train the model
+    history = model.fit(X_train, y_train, epochs=15, batch_size=64, class_weight={0: 155/253, 1: 98/253}, verbose=0, callbacks=[EarlyStopping(monitor='loss', patience=3, min_delta=0.001)])
+
+    return model, history
