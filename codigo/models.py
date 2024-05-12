@@ -1,19 +1,21 @@
 from random import randint
 import numpy as np
+from sklearn.calibration import cross_val_predict
 from sklearn.metrics import confusion_matrix, f1_score
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_validate
 from sklearn.neighbors import KNeighborsClassifier
 
 
 def Quadratic() :
     pass
 
-def KNN_range(input_data, array_neighbors, repeat_by_neighbors = 5, size_sample = 0.2) : 
+def KNN_range(input_data, array_neighbors, repeat_by_neighbors = 1, size_sample = 0.2) : 
     
-    
-    
-    # test done with holdout 
-    seeds = [randint(0, 1000) for i in range(repeat_by_neighbors)]
+    # input_data = [X, y]
+    X, y = input_data
+ 
     data = {
         'f1' : [], # f1 score
         'fn' : [] # False Negative rate
@@ -25,20 +27,23 @@ def KNN_range(input_data, array_neighbors, repeat_by_neighbors = 5, size_sample 
         classifier = KNeighborsClassifier(n_neighbors = neighbor)
         temp_data = [[], []]
         for j in range(repeat_by_neighbors):
-            # split the data
-            X_train, X_test, y_train, y_test = train_test_split(input_data[0], input_data[1], test_size=size_sample, random_state=seeds[j])
             
-            # train the classifier
-            classifier.fit(X_train, y_train)
-    
+            # metrics we want 
+            scoring = ['f1_weighted']
+            
             # get the result
-            result = classifier.predict(X_test)
-                
-            # get f1 score
-            temp_data[0].append(f1_score(y_test, result))
+            result = cross_validate(classifier,  X, y, cv=5, scoring=scoring)
             
-            # get the False Negative rate 
-            temp_data[1].append(confusion_matrix(y_test, result).ravel()[2])
+        
+            # Calculate the confusion matrix 
+            predicted = cross_val_predict(classifier, X, y, cv=5)
+
+            F_N = confusion_matrix(y, predicted).ravel()[2].mean()
+            
+            # print(result)
+            temp_data[0].append(result['test_f1_weighted'].mean())
+            temp_data[1].append(F_N)
+          
         
         
         data['f1'].append(np.mean(temp_data[0]))
@@ -69,3 +74,7 @@ def KNN(n_neighbors=5, validation="holdout") :
 def MLP() :
     pass
     
+    
+    
+    
+
