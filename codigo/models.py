@@ -6,6 +6,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import cross_validate
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.calibration import cross_val_predict
+from sklearn.cluster import KMeans
+from sklearn.model_selection import cross_validate
+
 
 
 def Quadratic() :
@@ -69,9 +73,43 @@ def KNN(n_neighbors=5, validation="holdout") :
         raise ValueError("validation must be 'holdout' or 'kfold'")
     
     
-def K_means() :
-    pass
+
+
+def K_means(input_data, nbr_of_clusters) : 
     
+    # input_data = [X, y]
+    X, y = input_data
+    
+    random_state = 42
+ 
+    data = {
+        'f1' : [], # f1 score
+        'fn' : [] # False Negative rate
+    }     
+    
+     
+    # create the classifier
+    for nbr in nbr_of_clusters:
+        
+        classifier = KMeans(n_clusters=nbr, random_state=random_state)
+        # metrics we want 
+        scoring = ['f1_weighted']
+        
+        # get the result
+        result = cross_validate(classifier,  X, y, cv=5, scoring=scoring)
+        
+    
+        # Calculate the confusion matrix 
+        predicted = cross_val_predict(classifier, X, y, cv=5)
+
+        F_N = confusion_matrix(y, predicted).ravel()[2]
+        
+        data['f1'].append(np.mean(result['test_f1_weighted']))
+        data['fn'].append(np.mean(F_N))
+        
+    
+    
+    return data
     
 def MLP() :
     pass
