@@ -13,6 +13,7 @@ def Quadratic() :
 
 def KNN_range(input_data, array_neighbors, repeat_by_neighbors = 1, size_sample = 0.2) : 
     
+    
     # input_data = [X, y]
     X, y = input_data
  
@@ -68,7 +69,8 @@ def KNN(n_neighbors=5, validation="holdout") :
         raise ValueError("validation must be 'holdout' or 'kfold'")
     
     
-    
+def K_means() :
+    pass
     
     
 def MLP() :
