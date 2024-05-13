@@ -1,7 +1,7 @@
 # own file
 thib_cache/
 myvenv/
-
+myenv/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

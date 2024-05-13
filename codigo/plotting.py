@@ -11,29 +11,33 @@ def printHistogram(title, full_data):
 
     # Mean F1 scores
     f1_scores = [data['f1'] for data in full_data.values()]
+    f1_scores_weighted = [data['f1_weighted'] for data in full_data.values()]
 
     # Mean false negatives
     false_negatives = [data['false_negatif'] for data in full_data.values()]
 
     # Width of the bars
-    bar_width = 0.35
+    bar_width = 0.25
 
     # Position of the bars on the X-axis
     x = np.arange(len(model_names))
 
     # Create figure and axes
-    fig, ax1 = plt.subplots(figsize=(10, 6))
+    fig, ax1 = plt.subplots(figsize=(12, 6))
 
     # Create bars for F1 on Y1 axis
-    ax1.bar(x - bar_width/2, f1_scores, bar_width, color='green', label='F1 Score')
+    ax1.bar(x - bar_width, f1_scores, bar_width, color='green', label='F1 Score')
 
-    # Y1 axis configuration for F1
-    ax1.set_ylabel('F1 Score', color='green')
-    ax1.tick_params(axis='y', labelcolor='green')
+    # Create bars for weighted F1 on Y1 axis
+    ax1.bar(x, f1_scores_weighted, bar_width, color='orange', label='F1 Score Weighted')
 
     # Create a second axis for false negatives on Y2 axis
     ax2 = ax1.twinx()
-    ax2.bar(x + bar_width/2, false_negatives, bar_width, color='blue', alpha=0.5, label='False Negatives')
+    ax2.bar(x + bar_width, false_negatives, bar_width, color='blue', alpha=0.5, label='False Negatives')
+
+    # Y-axis configuration for F1 and F1 weighted
+    ax1.set_ylabel('F1 Score', color='green')
+    ax1.tick_params(axis='y', labelcolor='green')
 
     # Y2 axis configuration for false negatives
     ax2.set_ylabel('False Negatives', color='blue')
@@ -53,6 +57,8 @@ def printHistogram(title, full_data):
     # Display the plot
     plt.tight_layout()
     plt.show()
+
+
     
     
     

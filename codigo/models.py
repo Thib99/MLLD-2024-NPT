@@ -79,13 +79,12 @@ def KNN(n_neighbors=5, validation="holdout") :
     
 
 
-def K_means(input_data, nbr_of_clusters) : 
+def K_means(input_data, nbr_of_rep=5) : 
     
     # input_data = [X, y]
     X, y = input_data
     
-    random_state = 42
- 
+   
     data = {
         'f1' : [], # f1 score
         'fn' : [] # False Negative rate
@@ -93,9 +92,9 @@ def K_means(input_data, nbr_of_clusters) :
     
      
     # create the classifier
-    for nbr in nbr_of_clusters:
+    for nbr in range(0,nbr_of_rep):
         
-        classifier = KMeans(n_clusters=nbr, random_state=random_state)
+        classifier = KMeans(n_clusters=2)
         # metrics we want 
         scoring = ['f1_weighted']
         
@@ -142,6 +141,7 @@ def getData_allModels_Holdout(X, Y , template_data) :
     # Initialize data within the dictionary
     for key in template_data.keys():
         template_data[key]['f1'] = []
+        template_data[key]['f1_weighted'] = []        
         template_data[key]['false_negatif'] = []
         template_data[key]['accuracy'] = [] 
         template_data[key]['time_fit'] = 0
@@ -155,7 +155,7 @@ def getData_allModels_Holdout(X, Y , template_data) :
 
         # Splitting the data into train and test sets
         # Make the sample with houldout
-        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=int_state)
+        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=int_state, stratify=True)
 
         
         #Loop for iterating over the models
@@ -168,7 +168,8 @@ def getData_allModels_Holdout(X, Y , template_data) :
             end_predict = time.time()         # End time for prediction
             
             # Calculating metrics and times
-            template_data[name]['f1'].append(f1_score(Y_test, result, average='weighted'))                                  # F1 score
+            template_data[name]['f1'].append(f1_score(Y_test, result))    # F1 score 
+            template_data[name]['f1_weighted'].append(f1_score(Y_test, result, average='weighted'))  # F1 score weighted
             template_data[name]['false_negatif'].append(confusion_matrix(Y_test, result).ravel()[2])    # False negatives
             template_data[name]['accuracy'].append(balanced_accuracy_score(Y_test, result))             # Balanced accuracy score
             template_data[name]['time_fit'] += end_fit - start_time                                     # Accumulated fitting time
@@ -178,6 +179,7 @@ def getData_allModels_Holdout(X, Y , template_data) :
     # get only mean of the data for easy plotting
     for key in template_data.keys():
         template_data[key]['f1'] = np.mean(template_data[key]['f1']).round(2)
+        template_data[key]['f1_weighted'] = np.mean(template_data[key]['f1_weighted']).round(2)
         template_data[key]['false_negatif'] = (np.mean(template_data[key]['false_negatif'])).round(2)
         template_data[key]['accuracy'] = np.mean(template_data[key]['accuracy']).round(2)
         template_data[key]['time_fit'] = np.mean(template_data[key]['time_fit'])
@@ -194,13 +196,14 @@ def getData_allModels_CrossValidation(X, Y , template_data) :
     # Initialize data within the dictionary
     for key in template_data.keys():
         template_data[key]['f1'] = []
+        template_data[key]['f1_weighted'] = []
         template_data[key]['false_negatif'] = []
         
 
     #Loop for iterating over the models
     for name in template_data.keys(): 
         reg = template_data[name]['model']
-        scoring = {'f1_weighted': 'f1_weighted', 'false_negatives': fn_scorer}
+        scoring = {'f1_weighted': 'f1_weighted', 'false_negatives': fn_scorer, 'f1': 'f1'}
         
         result = cross_validate(reg,  X, Y, cv=5, scoring=scoring)
 
@@ -213,6 +216,7 @@ def getData_allModels_CrossValidation(X, Y , template_data) :
     # get only mean of the data for easy plotting
     for key in template_data.keys():
         template_data[key]['f1'] = np.mean(template_data[key]['f1']).round(2)
+        template_data[key]['f1_weighted'] = np.mean(template_data[key]['f1_weighted']).round(2)
         template_data[key]['false_negatif'] = (np.mean(template_data[key]['false_negatif'])).round(2) 
     
     return template_data
