@@ -6,12 +6,13 @@
 - Nabil Kaci
 
 **Summary:**
+
 In this project, our aim is to develop a robust machine learning model to predict whether a person has brain cancer or not, based on MRI images. We start by preprocessing the images using the Sobel filter to remove non-meaningful information. We experiment with various machine learning models taught in class and optimize their parameters to achieve the best possible results. Additionally, we implement a Convolutional Neural Network (CNN) model using TensorFlow to further enhance our predictive performance.
 
 **Database Information:**
-- [Link to the database]
 - Number of images with tumor: 155
 - Number of images without tumor: 98
+- https://www.kaggle.com/datasets/navoneel/brain-mri-images-for-brain-tumor-detection
 
 **Installation:**
 To install all the required dependencies needed to run the project, execute the following command:
