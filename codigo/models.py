@@ -2,7 +2,7 @@ from random import randint
 import time
 import numpy as np
 from sklearn.calibration import cross_val_predict
-from sklearn.metrics import balanced_accuracy_score, confusion_matrix, f1_score, make_scorer
+from sklearn.metrics import balanced_accuracy_score, confusion_matrix, f1_score, make_scorer, roc_curve
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import cross_validate
@@ -146,6 +146,7 @@ def getData_allModels_Holdout(X, Y , template_data) :
         template_data[key]['accuracy'] = [] 
         template_data[key]['time_fit'] = 0
         template_data[key]['time_predict'] = 0
+        template_data[key]['roc_curve'] = []
         
 
     random_seeds = [914, 895, 365, 264, 59, 500, 129]  # List of random seeds
@@ -155,7 +156,7 @@ def getData_allModels_Holdout(X, Y , template_data) :
 
         # Splitting the data into train and test sets
         # Make the sample with houldout
-        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=int_state, stratify=True)
+        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=int_state)
 
         
         #Loop for iterating over the models
@@ -167,6 +168,12 @@ def getData_allModels_Holdout(X, Y , template_data) :
             result = reg.predict(X_test)      # Predictions
             end_predict = time.time()         # End time for prediction
             
+            predict = reg.predict(X_test)
+            roc_curve_data = roc_curve(Y_test, predict)
+            
+            print(roc_curve_data)
+            
+            
             # Calculating metrics and times
             template_data[name]['f1'].append(f1_score(Y_test, result))    # F1 score 
             template_data[name]['f1_weighted'].append(f1_score(Y_test, result, average='weighted'))  # F1 score weighted
@@ -174,6 +181,9 @@ def getData_allModels_Holdout(X, Y , template_data) :
             template_data[name]['accuracy'].append(balanced_accuracy_score(Y_test, result))             # Balanced accuracy score
             template_data[name]['time_fit'] += end_fit - start_time                                     # Accumulated fitting time
             template_data[name]['time_predict'] += end_predict - end_fit
+            # if array is not 3*3 , then dont appen it pay attebtion the width and height of the array
+            if len(roc_curve_data) == 3 and len(roc_curve_data[0]) == 3 and len(roc_curve_data[1]) == 3 :
+                template_data[name]['roc_curve'].append([roc_curve_data[0][1], roc_curve_data[1][1]])
             
 
     # get only mean of the data for easy plotting
@@ -184,6 +194,7 @@ def getData_allModels_Holdout(X, Y , template_data) :
         template_data[key]['accuracy'] = np.mean(template_data[key]['accuracy']).round(2)
         template_data[key]['time_fit'] = np.mean(template_data[key]['time_fit'])
         template_data[key]['time_predict'] = np.mean(template_data[key]['time_predict'])
+        template_data[key]['roc_curve'] = np.mean(template_data[key]['roc_curve'])
         
         
     return template_data
