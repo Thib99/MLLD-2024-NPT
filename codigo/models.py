@@ -1,21 +1,17 @@
-from random import randint
-import time
 import numpy as np
+import time
 from sklearn.calibration import cross_val_predict
 from sklearn.metrics import balanced_accuracy_score, confusion_matrix, f1_score, make_scorer, roc_curve
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import cross_validate
+from sklearn.model_selection import train_test_split, cross_validate
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.calibration import cross_val_predict
 from sklearn.cluster import KMeans
-from sklearn.model_selection import cross_validate
 from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, Flatten
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.metrics import Precision, Recall
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import BinaryCrossentropy
+
 
 
 def Quadratic() :
@@ -229,8 +225,10 @@ def getData_allModels_CrossValidation(X, Y , template_data) :
 
         
         # Calculating metrics and times
-        template_data[name]['f1'].append(result['test_f1_weighted'])      # F1 score
+        template_data[name]['f1_weighted'].append(result['test_f1_weighted'])      # F1 score
         template_data[name]['false_negatif'].append(result['test_false_negatives'])    # False negatives
+        template_data[name]['f1'].append(result['test_f1'])    # F1 score weighted
+
             
 
     # get only mean of the data for easy plotting

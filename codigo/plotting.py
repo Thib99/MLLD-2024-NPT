@@ -5,6 +5,13 @@ import numpy as np
 
 
 def printHistogram(title, full_data):
+    """
+    This function prints an histogram of the F1 scores, weighted F1 scores and false negatives of the different models.
+    :param title: The title of the plot.
+    :param full_data: The data of computed for the different models.
+    :return: None
+    """
+    
         
     # Model names
     model_names = [data['short_name'] for data in full_data.values()]
