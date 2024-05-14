@@ -148,7 +148,6 @@ def getData_allModels_Holdout(X, Y, template_data):
         template_data[key]['time_predict'] = 0
         template_data[key]['fpr']= []
         template_data[key]['tpr']= [] 
-        template_data[key]['thresholds'] = []
 
         
     random_seeds = [914, 895, 365, 264, 59, 500, 129]  # List of random seeds
@@ -186,16 +185,11 @@ def getData_allModels_Holdout(X, Y, template_data):
             if hasattr(reg, 'predict_proba'):
                 fpr, tpr, thresholds = roc_curve(Y_test, probs[:, 1])
                 # Ensure that fpr and tpr have the same length
-                min_len = min(len(fpr), len(tpr))
-                fpr = fpr[:min_len]
-                tpr = tpr[:min_len]
                 template_data[name]['tpr'].append(tpr)
                 template_data[name]['fpr'].append(fpr)
-                template_data[name]['thresholds'].append(thresholds)
             else:
                 template_data[name]['tpr'] = None
                 template_data[name]['fpr'] = None
-                template_data[name]['thresholds'] = None
 
     # Calculate mean metrics and times
     for key in template_data.keys():
@@ -206,13 +200,13 @@ def getData_allModels_Holdout(X, Y, template_data):
         template_data[key]['time_fit'] = np.mean(template_data[key]['time_fit'])
         template_data[key]['time_predict'] = np.mean(template_data[key]['time_predict'])
         # Calculate mean ROC curve if probabilities available
-        print (template_data[key]['tpr'])
-        print (template_data[key]['fpr'])
         if template_data[name].get('tpr') is not None:
-            mean_tpr = np.mean(template_data[key]['tpr'], axis=0)
-            mean_fpr = np.mean(template_data[key]['fpr'], axis=0)
-            template_data[key]['mean_roc_curve'] = (mean_fpr, mean_tpr)
-
+            template_data[name]['tpr'] = np.mean(template_data[key]['tpr'], axis=0)
+            template_data[name]['fpr'] = np.mean(template_data[key]['fpr'], axis=0)
+        else:
+            template_data[name]['tpr'] = None
+            template_data[name]['fpr'] = None
+        
     return template_data
 
 
