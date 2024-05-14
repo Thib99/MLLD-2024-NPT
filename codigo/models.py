@@ -136,8 +136,8 @@ fn_scorer = make_scorer(false_negatives_score, greater_is_better=True)
 ######################################### END  ######################################################
 
 
-def getData_allModels_Holdout(X, Y , template_data) : 
-        
+def getData_allModels_Holdout(X, Y, template_data):
+    
     # Initialize data within the dictionary
     for key in template_data.keys():
         template_data[key]['f1'] = []
@@ -146,20 +146,20 @@ def getData_allModels_Holdout(X, Y , template_data) :
         template_data[key]['accuracy'] = [] 
         template_data[key]['time_fit'] = 0
         template_data[key]['time_predict'] = 0
-        template_data[key]['roc_curve'] = []
-        
+        template_data[key]['fpr']= []
+        template_data[key]['tpr']= [] 
+        template_data[key]['thresholds'] = []
 
+        
     random_seeds = [914, 895, 365, 264, 59, 500, 129]  # List of random seeds
+    
     # Loop for iterating over different random seeds
     for int_state in random_seeds:
 
-
         # Splitting the data into train and test sets
-        # Make the sample with houldout
-        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=int_state)
+        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=int_state, stratify=Y)
 
-        
-        #Loop for iterating over the models
+        # Loop for iterating over the models
         for name in template_data.keys(): 
             reg = template_data[name]['model']
             start_time = time.time()          # Start time for fitting
@@ -168,11 +168,12 @@ def getData_allModels_Holdout(X, Y , template_data) :
             result = reg.predict(X_test)      # Predictions
             end_predict = time.time()         # End time for prediction
             
-            predict = reg.predict(X_test)
-            roc_curve_data = roc_curve(Y_test, predict)
-            
-            print(roc_curve_data)
-            
+            # Check if the model has predict_proba method
+            if hasattr(reg, 'predict_proba'):
+                probs = reg.predict_proba(X_test) # Probabilities
+            else:
+                probs = None
+                
             
             # Calculating metrics and times
             template_data[name]['f1'].append(f1_score(Y_test, result))    # F1 score 
@@ -181,24 +182,38 @@ def getData_allModels_Holdout(X, Y , template_data) :
             template_data[name]['accuracy'].append(balanced_accuracy_score(Y_test, result))             # Balanced accuracy score
             template_data[name]['time_fit'] += end_fit - start_time                                     # Accumulated fitting time
             template_data[name]['time_predict'] += end_predict - end_fit
-            # if array is not 3*3 , then dont appen it pay attebtion the width and height of the array
-            if len(roc_curve_data) == 3 and len(roc_curve_data[0]) == 3 and len(roc_curve_data[1]) == 3 :
-                template_data[name]['roc_curve'].append([roc_curve_data[0][1], roc_curve_data[1][1]])
-            
+            # Calculate ROC curve for each fold and store the values if probabilities available
+            if hasattr(reg, 'predict_proba'):
+                fpr, tpr, thresholds = roc_curve(Y_test, probs[:, 1])
+                # Ensure that fpr and tpr have the same length
+                min_len = min(len(fpr), len(tpr))
+                fpr = fpr[:min_len]
+                tpr = tpr[:min_len]
+                template_data[name]['tpr'].append(tpr)
+                template_data[name]['fpr'].append(fpr)
+                template_data[name]['thresholds'].append(thresholds)
+            else:
+                template_data[name]['tpr'] = None
+                template_data[name]['fpr'] = None
+                template_data[name]['thresholds'] = None
 
-    # get only mean of the data for easy plotting
+    # Calculate mean metrics and times
     for key in template_data.keys():
         template_data[key]['f1'] = np.mean(template_data[key]['f1']).round(2)
         template_data[key]['f1_weighted'] = np.mean(template_data[key]['f1_weighted']).round(2)
-        template_data[key]['false_negatif'] = (np.mean(template_data[key]['false_negatif'])).round(2)
+        template_data[key]['false_negatif'] = np.mean(template_data[key]['false_negatif']).round(2)
         template_data[key]['accuracy'] = np.mean(template_data[key]['accuracy']).round(2)
         template_data[key]['time_fit'] = np.mean(template_data[key]['time_fit'])
         template_data[key]['time_predict'] = np.mean(template_data[key]['time_predict'])
-        template_data[key]['roc_curve'] = np.mean(template_data[key]['roc_curve'])
-        
-        
-    return template_data
+        # Calculate mean ROC curve if probabilities available
+        print (template_data[key]['tpr'])
+        print (template_data[key]['fpr'])
+        if template_data[name].get('tpr') is not None:
+            mean_tpr = np.mean(template_data[key]['tpr'], axis=0)
+            mean_fpr = np.mean(template_data[key]['fpr'], axis=0)
+            template_data[key]['mean_roc_curve'] = (mean_fpr, mean_tpr)
 
+    return template_data
 
 
 
