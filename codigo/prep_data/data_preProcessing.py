@@ -60,7 +60,7 @@ def resize_images_based_on_outbound(file_name, file_name_output):
     # load the image in gray scale
     image = cv2.imread(file_name, cv2.IMREAD_GRAYSCALE)
 
-    # Convolution Matrice (filtre de Sobel) 
+    # Convolution Matrix (Sobel Filter)
     kernel_x = np.array([[-1, 0, 1],
                         [-2, 0, 2],
                         [-1, 0, 1]])
